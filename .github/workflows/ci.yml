@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Fetch bundled fonts
+        run: bash scripts/fetch-fonts.sh
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Byte-compile Python
+        run: python -m compileall -q install.py tests
+
+      - name: Run validation tests
+        run: python -m unittest discover -s tests -t tests -v
+
+  install:
+    name: weectl extension install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Fetch bundled fonts
+        run: bash scripts/fetch-fonts.sh
+
+      - name: Install WeeWX
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Create a scratch station
+        run: |
+          weectl station create "$RUNNER_TEMP/station" --no-prompt \
+            --driver=weewx.drivers.simulator --location="CI Station" \
+            --latitude=45.551234 --longitude=-122.671234 --altitude="200, foot" \
+            --units=us
+
+      - name: Install the extension
+        run: weectl extension install . -y --config="$RUNNER_TEMP/station/weewx.conf"
+
+      - name: Check the installation
+        run: |
+          weectl extension list --config="$RUNNER_TEMP/station/weewx.conf"
+          grep -q '\[\[MatrixReport\]\]' "$RUNNER_TEMP/station/weewx.conf"
+          test -f "$RUNNER_TEMP/station/skins/Matrix/skin.conf"
+          test -f "$RUNNER_TEMP/station/skins/Matrix/static/matrix.css"
+
+      - name: Generate a report
+        run: weectl report run MatrixReport --config="$RUNNER_TEMP/station/weewx.conf"
+
+      - name: Uninstall cleanly
+        run: |
+          weectl extension uninstall weewx-matrix -y --config="$RUNNER_TEMP/station/weewx.conf"
+          test ! -f "$RUNNER_TEMP/station/skins/Matrix/skin.conf"
+          ! grep -q 'MatrixReport' "$RUNNER_TEMP/station/weewx.conf"
+
+  package:
+    name: build release archive
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    needs: [validate, install]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch bundled fonts
+        run: bash scripts/fetch-fonts.sh
+
+      - name: Create extension zip
+        run: |
+          mkdir -p dist
+          VERSION=$(python -c "import importlib.util; spec=importlib.util.spec_from_file_location('install','install.py'); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m); print(m.VERSION)")
+          ARCHIVE="dist/weewx-matrix-${VERSION}.zip"
+          rm -f "$ARCHIVE"
+          zip -r "$ARCHIVE" . \
+            -x '*.git*' -x 'dist/*' -x '.venv/*' -x '__pycache__/*' -x '*.pyc'
+          echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
+          unzip -l "$ARCHIVE" | head -30
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weewx-matrix-extension
+          path: dist/*.zip

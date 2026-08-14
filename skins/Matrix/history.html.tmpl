@@ -1,0 +1,126 @@
+## history.html.tmpl -- Matrix skin historical data viewer.
+## Shows Day/Week/Month/Year plot tabs plus a side-by-side statistics table.
+#errorCatcher Echo
+#encoding UTF-8
+#set global $rel = ""
+#set global $nav_current = "history"
+#set $periods = $to_list($DisplayOptions.get('periods', ['day', 'week', 'month', 'year']))
+#set $plot_groups = $to_list($DisplayOptions.get('plot_groups', ['tempdew', 'wind', 'rain']))
+#set $observations = $to_list($DisplayOptions.get('observations_stats', ['outTemp', 'windSpeed', 'rain']))
+#set $obs_type_sum = $to_list($DisplayOptions.get('obs_type_sum', ['rain']))
+#set $obs_type_max = $to_list($DisplayOptions.get('obs_type_max', ['rainRate']))
+#set $time_tags = [$day, $week, $month, $year]
+#set $period_labels = {'day': $gettext('Day'), 'week': $gettext('Week'), 'month': $gettext('Month'), 'year': $gettext('Year')}
+## Span used to decide whether a given observation has enough recent data to
+## be worth plotting at all.
+#set $recent = $span($day_delta=400, boundary='midnight')
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$gettext("History") :: $station.location :: MATRIX_OS</title>
+  <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
+  <link rel="stylesheet" href="static/matrix.css">
+</head>
+<body>
+  <canvas id="rain"></canvas>
+  <div class="crt">
+
+    #include "titlebar.inc"
+
+    <main class="terminal">
+
+      <section class="panel">
+        <h2>$gettext("Historical Data")</h2>
+
+        <div class="tabs">
+        #for $i, $period in enumerate($periods)
+          #set $active = ' active' if $i == 0 else ''
+          <button type="button" class="tab-btn$active" data-tab-target="tab-$period">$period_labels.get($period, $period)</button>
+        #end for
+        </div>
+
+        #for $i, $period in enumerate($periods)
+          #set $active = ' active' if $i == 0 else ''
+          <div id="tab-$period" class="tab-panel$active">
+            <div class="plotgrid">
+            #for $plot_group in $plot_groups
+              #set $plot_name = $period + $plot_group
+              #set $show_plot = False
+              #for $obs_name in $getobs($plot_name)
+                #if $recent.check_for_data($obs_name)
+                  #set $show_plot = True
+                #end if
+              #end for
+              #if $show_plot
+              <figure>
+                <img src="${plot_name}.png" alt="$plot_name" loading="lazy">
+                <figcaption>${plot_name}.png</figcaption>
+              </figure>
+              #end if
+            #end for
+            </div>
+          </div>
+        #end for
+
+      </section>
+
+      <section class="panel">
+        <h2>$gettext("Statistics")</h2>
+        <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>$gettext("Home")</th>
+              <th></th>
+              <th>$gettext("Day")</th>
+              <th>$gettext("Week")</th>
+              <th>$gettext("Month")</th>
+              <th>$gettext("Year")</th>
+            </tr>
+          </thead>
+          <tbody>
+#for $x in $observations
+  #if $getVar('year.%s.has_data' % $x, False)
+        <tr>
+          <td>$obs.label[$x]</td>
+          <td class="mono-small">$getattr($unit.label, $x, '')</td>
+    #if $x in $obs_type_sum
+      #for $time_tag in $time_tags
+          <td>$getattr($time_tag, $x).sum.format(add_label=False)</td>
+      #end for
+    #elif $x in $obs_type_max
+      #for $time_tag in $time_tags
+          <td>$getattr($time_tag, $x).max.format(add_label=False)<br><span class="timestamp">$getattr($time_tag, $x).maxtime</span></td>
+      #end for
+    #else
+      #for $time_tag in $time_tags
+          <td>
+            $gettext("Max"): $getattr($time_tag, $x).max.format(add_label=False)<br>
+            $gettext("Min"): $getattr($time_tag, $x).min.format(add_label=False)<br>
+            $gettext("Avg"): $getattr($time_tag, $x).avg.format(add_label=False)
+          </td>
+      #end for
+    #end if
+        </tr>
+  #end if
+#end for
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <section class="panel center">
+        <p>$gettext("Deep archive intro")</p>
+        <p><a class="btn" href="archive.html">&gt; $gettext("Access Deep Archive")</a></p>
+      </section>
+
+    </main>
+
+    #include "footer.inc"
+  </div>
+
+  <script src="static/matrix.js" defer></script>
+</body>
+</html>

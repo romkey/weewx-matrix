@@ -1,0 +1,106 @@
+## archive/month-%Y-%m.html.tmpl -- Matrix skin per-month historical archive page.
+## Generated once for every calendar month present in the database (SummaryByMonth).
+## NOTE: #include paths below are relative to the skin root, not this file's
+## directory, because WeeWX runs the Cheetah generator with the skin
+## directory as the current working directory.
+#errorCatcher Echo
+#encoding UTF-8
+#set global $rel = "../"
+#set global $nav_current = "archive"
+#set $has_uv = $month.UV.has_data
+#set $has_aq = $month.pm2_5.has_data
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$month_name $year_name :: $gettext("Daily Log") :: MATRIX_OS</title>
+  <link rel="icon" type="image/svg+xml" href="../static/favicon.svg">
+  <link rel="stylesheet" href="../static/matrix.css">
+</head>
+<body>
+  <canvas id="rain"></canvas>
+  <div class="crt">
+
+    #include "titlebar.inc"
+
+    <main class="terminal">
+
+      <section class="panel">
+        <p><a href="../archive.html">&laquo; $gettext("Back to Archive")</a></p>
+        <h2>$gettext("Daily Log") :: $month_name $year_name</h2>
+
+        <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>$gettext("Day")</th>
+              <th>$obs.label.outTemp $gettext("Avg")</th>
+              <th>$obs.label.outTemp $gettext("Max")</th>
+              <th>$obs.label.outTemp $gettext("Min")</th>
+              <th>$obs.label.rain $gettext("Sum")</th>
+              <th>$obs.label.wind $gettext("Avg")</th>
+              <th>$obs.label.wind $gettext("Max")</th>
+              #if $has_uv
+              <th>$gettext("UV Index") $gettext("Max")</th>
+              #end if
+              #if $has_aq
+              <th>PM2.5 $gettext("Avg")</th>
+              <th>PM2.5 $gettext("Max")</th>
+              #end if
+            </tr>
+          </thead>
+          <tbody>
+          #for $d in $month.days
+            #if $d.outTemp.has_data or $d.rain.has_data or $d.wind.has_data
+            <tr>
+              <td>$d.dateTime.format("%d %a", add_label=False)</td>
+              <td>$d.outTemp.avg.format(add_label=False)</td>
+              <td>$d.outTemp.max.format(add_label=False)</td>
+              <td>$d.outTemp.min.format(add_label=False)</td>
+              <td>$d.rain.sum.format(add_label=False)</td>
+              <td>$d.wind.avg.format(add_label=False)</td>
+              <td>$d.wind.max.format(add_label=False)</td>
+              #if $has_uv
+              <td>$d.UV.max.format(add_label=False)</td>
+              #end if
+              #if $has_aq
+              <td>$d.pm2_5.avg.format(add_label=False)</td>
+              <td>$d.pm2_5.max.format(add_label=False)</td>
+              #end if
+            </tr>
+            #end if
+          #end for
+          </tbody>
+          #if $month.outTemp.has_data or $month.rain.has_data or $month.wind.has_data
+          <tfoot>
+            <tr>
+              <td>$gettext("Monthly Summary")</td>
+              <td>$month.outTemp.avg.format(add_label=False)</td>
+              <td>$month.outTemp.max.format(add_label=False)</td>
+              <td>$month.outTemp.min.format(add_label=False)</td>
+              <td>$month.rain.sum.format(add_label=False)</td>
+              <td>$month.wind.avg.format(add_label=False)</td>
+              <td>$month.wind.max.format(add_label=False)</td>
+              #if $has_uv
+              <td>$month.UV.max.format(add_label=False)</td>
+              #end if
+              #if $has_aq
+              <td>$month.pm2_5.avg.format(add_label=False)</td>
+              <td>$month.pm2_5.max.format(add_label=False)</td>
+              #end if
+            </tr>
+          </tfoot>
+          #end if
+        </table>
+        </div>
+      </section>
+
+    </main>
+
+    #include "footer.inc"
+  </div>
+
+  <script src="../static/matrix.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+## about.html.tmpl -- system/station info page for the Matrix skin.
+#errorCatcher Echo
+#encoding UTF-8
+#set global $rel = ""
+#set global $nav_current = "about"
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$gettext("System Info") :: $station.location :: MATRIX_OS</title>
+  <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
+  <link rel="stylesheet" href="static/matrix.css">
+</head>
+<body>
+  <canvas id="rain"></canvas>
+  <div class="crt">
+
+    #include "titlebar.inc"
+
+    <main class="terminal">
+
+      <section class="panel">
+        <h2>$gettext("System Info")</h2>
+        <div class="grid">
+          <div class="readout">
+            <span class="label">$gettext("Station")</span>
+            <span class="value">$station.location</span>
+          </div>
+          <div class="readout">
+            <span class="label">$gettext("Hardware")</span>
+            <span class="value">$station.hardware</span>
+          </div>
+          <div class="readout">
+            <span class="label">$gettext("Latitude")</span>
+            <span class="value">$station.latitude[0]&deg; $station.latitude[1]' $station.latitude[2]</span>
+          </div>
+          <div class="readout">
+            <span class="label">$gettext("Longitude")</span>
+            <span class="value">$station.longitude[0]&deg; $station.longitude[1]' $station.longitude[2]</span>
+          </div>
+          <div class="readout">
+            <span class="label">$pgettext("Geographical", "Altitude")</span>
+            <span class="value">$station.altitude</span>
+          </div>
+          <div class="readout">
+            <span class="label">$gettext("Rain Year")</span>
+            <span class="value">$rainyear.rain.sum</span>
+          </div>
+          <div class="readout">
+            <span class="label">$gettext("Server Uptime")</span>
+            <span class="value">$station.os_uptime.long_form</span>
+          </div>
+          <div class="readout">
+            <span class="label">$gettext("WeeWX Uptime")</span>
+            <span class="value">$station.uptime.long_form</span>
+          </div>
+          <div class="readout">
+            <span class="label">$gettext("WeeWX Version")</span>
+            <span class="value">$station.version</span>
+          </div>
+          <div class="readout">
+            <span class="label">$gettext("Skin")</span>
+            <span class="value">$SKIN_NAME $SKIN_VERSION</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    #include "footer.inc"
+  </div>
+
+  <script src="static/matrix.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+1.0.0 — 2026-08-14
+  Initial release.
+  - Live dashboard with phosphor-green terminal styling and digital rain.
+  - History browser with Day/Week/Month/Year plots and statistics table.
+  - Deep archive with per-month and per-year generated pages.
+  - Extended sensor support (UV, radiation, air quality, lightning) with
+    graceful degradation when data is absent.
+  - Self-hosted Share Tech Mono and VT323 fonts (SIL Open Font License).

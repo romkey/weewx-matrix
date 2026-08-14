@@ -1,0 +1,70 @@
+## index.html.tmpl -- Matrix skin dashboard
+#errorCatcher Echo
+#encoding UTF-8
+#set global $rel = ""
+#set global $nav_current = "index"
+#set $plot_groups = $to_list($DisplayOptions.get('plot_groups', ['tempdew', 'wind', 'rain']))
+## Span used to decide whether a plot has enough recent data to be worth showing.
+#set $recent = $span($day_delta=30, boundary='midnight')
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$station.location :: MATRIX_OS</title>
+  <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
+  <link rel="stylesheet" href="static/matrix.css">
+  #if $station.station_url
+  <link rel="canonical" href="$station.station_url/index.html" />
+  #end if
+  #if $Extras.has_key('googleAnalyticsId')
+  <script async src="https://www.googletagmanager.com/gtag/js?id=$Extras.googleAnalyticsId"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '$Extras.googleAnalyticsId');
+  </script>
+  #end if
+</head>
+<body>
+  <canvas id="rain"></canvas>
+  <div class="crt">
+
+    #include "titlebar.inc"
+
+    <main class="terminal">
+
+      #include "current.inc"
+      #include "sensors.inc"
+
+      <section class="panel">
+        <h2>$gettext("Live Telemetry")</h2>
+        <div class="plotgrid">
+        #for $plot_group in $plot_groups
+          #set $plot_name = 'day' + $plot_group
+          #set $show_plot = False
+          #for $obs_name in $getobs($plot_name)
+            #if $recent.check_for_data($obs_name)
+              #set $show_plot = True
+            #end if
+          #end for
+          #if $show_plot
+          <figure>
+            <img src="${plot_name}.png" alt="$plot_name" loading="lazy">
+            <figcaption>${plot_name}.png</figcaption>
+          </figure>
+          #end if
+        #end for
+        </div>
+        <p><a class="btn" href="history.html">&gt; $gettext("Access Historical Archives")</a></p>
+      </section>
+
+    </main>
+
+    #include "footer.inc"
+  </div>
+
+  <script src="static/matrix.js" defer></script>
+</body>
+</html>
