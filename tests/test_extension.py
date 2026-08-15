@@ -128,7 +128,7 @@ class TestMatrixExtension(unittest.TestCase):
             extras_text = skin_conf.read()
         self.assertIn('hardware_name', extras_text)
         self.assertIn('atproto', extras_text)
-        self.assertEqual(conf['SKIN_VERSION'], '1.1.1')
+        self.assertEqual(conf['SKIN_VERSION'], '1.1.2')
 
 
 if __name__ == '__main__':

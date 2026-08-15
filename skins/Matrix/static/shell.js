@@ -575,6 +575,13 @@
     if (!this.inputEl || !this.cursorEl) {
       return;
     }
+    // Applied inline so a cached older stylesheet cannot leave the block
+    // cursor floating inline at the end of the row alongside the native caret.
+    this.cursorEl.style.position = "absolute";
+    this.cursorEl.style.margin = "0";
+    this.cursorEl.style.pointerEvents = "none";
+    this.inputEl.style.caretColor = "transparent";
+
     var sync = function () {
       self.updateCursor();
     };

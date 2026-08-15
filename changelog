@@ -1,3 +1,12 @@
+1.1.2 — 2026-08-14
+  Cache-bust static CSS as well as JS so upgraded styles take effect.
+  Shell input autofocuses and accepts typing without a click.
+  Block cursor replaces the native caret and tracks the insertion point.
+
+1.1.1 — 2026-08-14
+  Fix recursion crash when an upgraded page loaded a cached matrix.js.
+  Safe Mode rain now restarts when switching back to Matrix mode.
+
 1.1.0 — 2026-08-14
   Safe Mode theme toggle: static, high-contrast UI honoring system dark mode.
   Light-palette plot set for Safe Mode on light-color-scheme systems.
