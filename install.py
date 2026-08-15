@@ -9,7 +9,7 @@ import os
 from weecfg.extension import ExtensionInstaller
 
 # Keep in sync with skins/Matrix/skin.conf (SKIN_VERSION) and changelog.
-VERSION = '1.1.2'
+VERSION = '1.2.0'
 SKIN = 'Matrix'
 EXTENSION_NAME = 'weewx-matrix'
 

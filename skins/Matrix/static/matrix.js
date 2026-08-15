@@ -3,6 +3,7 @@
  * Theme state lives in theme-toggle.inc (inline); do not export MatrixTheme here.
  *   - Digital rain canvas backdrop
  *   - Live clock
+ *   - Periodic refresh of current conditions from current.json
  *   - Shell block cursor (see shell.js)
  *   - Safe Mode / Matrix theme toggle
  *   - Light plot swap in Safe Mode on light systems
@@ -188,6 +189,76 @@
     }
   }
 
+  function resolvePath(obj, path) {
+    return path.split(".").reduce(function (acc, key) {
+      return acc === null || acc === undefined ? undefined : acc[key];
+    }, obj);
+  }
+
+  function applyLiveData(data) {
+    document.querySelectorAll("[data-live]").forEach(function (el) {
+      var value = resolvePath(data, el.getAttribute("data-live"));
+      if (value === undefined || value === null) {
+        return;
+      }
+      var text = String(value);
+      if (el.textContent === text) {
+        return;
+      }
+      el.textContent = text;
+      el.classList.remove("live-flash");
+      void el.offsetWidth;
+      el.classList.add("live-flash");
+    });
+  }
+
+  function initLiveUpdates() {
+    var root = document.querySelector("[data-live-url]");
+    if (!root || typeof window.fetch !== "function") {
+      return;
+    }
+    var url = root.getAttribute("data-live-url");
+    var seconds = parseInt(root.getAttribute("data-live-interval"), 10);
+    if (!url || !seconds || seconds < 5) {
+      return;
+    }
+    if (!document.querySelector("[data-live]")) {
+      return;
+    }
+
+    var inFlight = false;
+
+    function poll() {
+      if (inFlight || document.hidden) {
+        return;
+      }
+      inFlight = true;
+      var bust = url + (url.indexOf("?") === -1 ? "?" : "&") + "t=" + Date.now();
+      window.fetch(bust, { cache: "no-store" })
+        .then(function (response) {
+          return response.ok ? response.json() : null;
+        })
+        .then(function (data) {
+          if (data) {
+            applyLiveData(data);
+          }
+        })
+        .catch(function () {
+          // Leave the last known good values in place.
+        })
+        .then(function () {
+          inFlight = false;
+        });
+    }
+
+    setInterval(poll, seconds * 1000);
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        poll();
+      }
+    });
+  }
+
   window.gotoArchive = function (prefix, value) {
     if (!value) {
       return;
@@ -199,6 +270,7 @@
     initThemeToggle();
     startClock();
     initTabs();
+    initLiveUpdates();
   }
 
   if (document.readyState === "loading") {

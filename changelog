@@ -1,3 +1,9 @@
+1.2.0 — 2026-08-14
+  Current conditions refresh in place from current.json once a minute.
+  New [Extras] option: live_update_seconds (0 disables polling).
+  JSON exports use UTF-8 instead of HTML entities, so degree signs
+  no longer appear as &#176; in the shell or in current.json.
+
 1.1.2 — 2026-08-14
   Cache-bust static CSS as well as JS so upgraded styles take effect.
   Shell input autofocuses and accepts typing without a click.

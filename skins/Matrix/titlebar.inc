@@ -10,6 +10,7 @@
 #set $default_theme = $Extras.get('default_theme', 'matrix')
 #set $hardware_display = $Extras.get('hardware_name', '') or $station.hardware
 #set $atproto_url = $Extras.get('atproto', '')
+#set $live_interval = int($Extras.get('live_update_seconds', 60))
 #if $current.outTemp.raw is not None
 #set $cur_outtemp = $current.outTemp.raw
 #else
@@ -66,7 +67,7 @@
 #set $day_outtemp_min = ''
 #end if
 
-<div id="title_bar">
+<div id="title_bar" data-live-url="${rel}current.json" data-live-interval="$live_interval">
   <div class="term_chrome">
     <span class="term_dot red"></span>
     <span class="term_dot amber"></span>
@@ -129,7 +130,7 @@
 
     <h1 class="page_title">$station.location</h1>
     <p class="lastupdate">
-      $gettext("Last Update"): $current.dateTime &nbsp;|&nbsp;
+      $gettext("Last Update"): <span data-live="current.dateTime">$current.dateTime</span> &nbsp;|&nbsp;
       <span class="clock" data-clock>&nbsp;</span>
     </p>
 

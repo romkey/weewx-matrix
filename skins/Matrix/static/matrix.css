@@ -697,6 +697,23 @@ footer.term_footer a {
   z-index: 1;
 }
 
+.live-flash {
+  animation: liveFlash 1.1s ease-out;
+}
+
+@keyframes liveFlash {
+  0% { color: var(--matrix-cyan); text-shadow: 0 0 10px var(--matrix-green-glow); }
+  100% { color: inherit; text-shadow: inherit; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-flash { animation: none; }
+}
+
+[data-theme="safe"] .live-flash {
+  animation: none;
+}
+
 .theme-toggle {
   font-family: var(--font-mono);
   font-size: 0.85rem;

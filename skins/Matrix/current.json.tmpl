@@ -23,6 +23,7 @@
   },
   "current": {
     "dateTime": "$current.dateTime",
+    "wind_dir_display": "$current.windDir.ordinal_compass ($current.windDir)",
     "observations": {
 #for $i, $obs in enumerate($export_obs)
       "$obs": "$getVar('current.' + $obs)"#if $i < len($export_obs) - 1
@@ -36,6 +37,7 @@
   "aggregates": {
     "day": {
       "rain_fmt": "$day.rain.sum",
+      "rainRate_max_fmt": "$day.rainRate.max",
       "outTemp_max_fmt": "$day.outTemp.max",
       "outTemp_min_fmt": "$day.outTemp.min",
       "outTemp_avg_fmt": "$day.outTemp.avg",
