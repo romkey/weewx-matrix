@@ -67,7 +67,9 @@ class TestMatrixExtension(unittest.TestCase):
             'about.html.tmpl',
             'rss.xml.tmpl',
             'shell-data.json.tmpl',
+            'current.json.tmpl',
             'theme-init.inc',
+            'theme-toggle.inc',
             'archive/month-%Y-%m.html.tmpl',
             'archive/year-%Y.html.tmpl',
         )
@@ -82,7 +84,7 @@ class TestMatrixExtension(unittest.TestCase):
             self.assertTrue(os.path.isfile(path), name)
 
     def test_new_templates_exist(self):
-        for name in ('shell-data.json.tmpl', 'theme-init.inc'):
+        for name in ('shell-data.json.tmpl', 'theme-init.inc', 'theme-toggle.inc', 'current.json.tmpl'):
             path = os.path.join(SKIN_DIR, name)
             self.assertTrue(os.path.isfile(path), name)
 
@@ -122,6 +124,10 @@ class TestMatrixExtension(unittest.TestCase):
         self.assertIn('enable_shell', conf['Extras'])
         self.assertIn('default_theme', conf['Extras'])
         self.assertIn('shell_history_days', conf['Extras'])
+        with open(os.path.join(SKIN_DIR, 'skin.conf'), encoding='utf-8') as skin_conf:
+            extras_text = skin_conf.read()
+        self.assertIn('hardware_name', extras_text)
+        self.assertIn('atproto', extras_text)
         self.assertEqual(conf['SKIN_VERSION'], '1.1.0')
 
 

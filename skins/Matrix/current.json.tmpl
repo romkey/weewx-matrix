@@ -1,0 +1,63 @@
+## current.json.tmpl -- live snapshot of station data (regenerated each report cycle)
+#errorCatcher Echo
+#set $hardware_display = $Extras.get('hardware_name', '') or $station.hardware
+#set $obs_names = $to_list($DisplayOptions.get('observations_current', [])) + $to_list($DisplayOptions.get('observations_extended', []))
+#set $seen = []
+#set $export_obs = []
+#for $obs in $obs_names
+#if $obs not in $seen and $getVar('year.%s.has_data' % $obs, False)
+#set $void = $seen.append($obs)
+#set $void = $export_obs.append($obs)
+#end if
+#end for
+{
+  "generated": "$current.dateTime.format('%Y-%m-%dT%H:%M:%S', add_label=False)",
+  "station": {
+    "location": "$station.location",
+    "hardware": "$hardware_display",
+    "driver": "$station.hardware",
+    "latitude": "$station.latitude[0]° $station.latitude[1]' $station.latitude[2]",
+    "longitude": "$station.longitude[0]° $station.longitude[1]' $station.longitude[2]",
+    "altitude": "$station.altitude",
+    "station_url": "$station.station_url"
+  },
+  "current": {
+    "dateTime": "$current.dateTime",
+    "observations": {
+#for $i, $obs in enumerate($export_obs)
+      "$obs": "$getVar('current.' + $obs)"#if $i < len($export_obs) - 1
+,#end if
+#end for
+    }
+  },
+  "trend": {
+    "barometer": "$trend.barometer.formatted"
+  },
+  "aggregates": {
+    "day": {
+      "rain_fmt": "$day.rain.sum",
+      "outTemp_max_fmt": "$day.outTemp.max",
+      "outTemp_min_fmt": "$day.outTemp.min",
+      "outTemp_avg_fmt": "$day.outTemp.avg",
+      "wind_max_fmt": "$day.wind.max"
+    },
+    "week": {
+      "rain_fmt": "$week.rain.sum",
+      "outTemp_max_fmt": "$week.outTemp.max",
+      "outTemp_min_fmt": "$week.outTemp.min"
+    },
+    "month": {
+      "rain_fmt": "$month.rain.sum",
+      "outTemp_max_fmt": "$month.outTemp.max",
+      "outTemp_min_fmt": "$month.outTemp.min"
+    },
+    "year": {
+      "rain_fmt": "$year.rain.sum",
+      "outTemp_max_fmt": "$year.outTemp.max",
+      "outTemp_min_fmt": "$year.outTemp.min"
+    },
+    "rainyear": {
+      "rain_fmt": "$rainyear.rain.sum"
+    }
+  }
+}

@@ -739,7 +739,7 @@ html.rmrf-reboot body {
 }
 
 @media (prefers-color-scheme: light) {
-  [data-theme="safe"] {
+  html[data-theme="safe"] {
     --safe-bg: #f8f9fa;
     --safe-surface: #ffffff;
     --safe-text: #1a1a1a;
@@ -754,7 +754,7 @@ html.rmrf-reboot body {
 }
 
 @media (prefers-color-scheme: dark) {
-  [data-theme="safe"] {
+  html[data-theme="safe"] {
     --safe-bg: #0d1117;
     --safe-surface: #161b22;
     --safe-text: #e6edf3;
@@ -768,13 +768,24 @@ html.rmrf-reboot body {
   }
 }
 
-[data-theme="safe"] {
+html[data-theme="safe"] {
+  --safe-bg: #0d1117;
+  --safe-surface: #161b22;
+  --safe-text: #e6edf3;
+  --safe-muted: #8b949e;
+  --safe-border: #30363d;
+  --safe-accent: #58a6ff;
+  --safe-accent-text: #0d1117;
+  --safe-hover: #21262d;
+  --safe-table-stripe: #1c2128;
+  --safe-chart-bg: #161b22;
   --font-mono: ui-monospace, "SFMono-Regular", "Segoe UI Mono", Menlo, Consolas, monospace;
   --font-display: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--safe-bg);
+  color: var(--safe-text);
 }
 
-[data-theme="safe"] html,
-[data-theme="safe"] body {
+html[data-theme="safe"] body {
   background: var(--safe-bg);
   color: var(--safe-text);
   font-family: var(--font-display);

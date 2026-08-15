@@ -1,5 +1,6 @@
 ## shell-data.json.tmpl -- cached weather data for the interactive shell
 #errorCatcher Echo
+#set $hardware_display = $Extras.get('hardware_name', '') or $station.hardware
 #set $history_days = int($Extras.get('shell_history_days', 120))
 #set $span_days = $span(day_delta=$history_days, boundary='midnight')
 #set $sensor_names = []
@@ -20,7 +21,8 @@
   "generated": "$current.dateTime.format('%Y-%m-%dT%H:%M:%S', add_label=False)",
   "station": {
     "location": "$station.location",
-    "hardware": "$station.hardware",
+    "hardware": "$hardware_display",
+    "driver": "$station.hardware",
     "latitude": "$station.latitude[0]° $station.latitude[1]' $station.latitude[2]",
     "longitude": "$station.longitude[0]° $station.longitude[1]' $station.longitude[2]",
     "altitude": "$station.altitude",

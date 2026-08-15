@@ -42,7 +42,6 @@
     this.inputEl = document.getElementById("shell-input");
     this.formEl = document.getElementById("shell-form");
     this.promptPathEl = document.getElementById("shell-prompt-path");
-    this.chromePathEl = document.getElementById("shell-chrome-path");
     this.dataUrl = rootEl.getAttribute("data-data-url") || "shell-data.json";
     this.seed = this.readSeedFromDom(rootEl);
     this.data = null;
@@ -437,9 +436,6 @@
     var display = this.cwd === "/" ? "/$" : this.cwd + "$";
     if (this.promptPathEl) {
       this.promptPathEl.textContent = display;
-    }
-    if (this.chromePathEl) {
-      this.chromePathEl.textContent = "guest@" + this.host + ":" + display;
     }
   };
 
@@ -1069,10 +1065,6 @@
   Shell.prototype.bind = function () {
     var self = this;
     this.updatePrompt();
-    this.print([
-      "Matrix shell v1.1 — type 'help' for commands.",
-      "Data archive: " + (this.dataUrl || "shell-data.json") + " (loaded on demand)"
-    ]);
 
     this.formEl.addEventListener("submit", function (e) {
       e.preventDefault();

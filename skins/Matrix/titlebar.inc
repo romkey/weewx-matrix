@@ -8,6 +8,8 @@
 #set $host_slug = $station.location.lower().replace(' ', '-').replace('/', '-')
 #set $enable_shell = $to_bool($Extras.get('enable_shell', True))
 #set $default_theme = $Extras.get('default_theme', 'matrix')
+#set $hardware_display = $Extras.get('hardware_name', '') or $station.hardware
+#set $atproto_url = $Extras.get('atproto', '')
 #if $current.outTemp.raw is not None
 #set $cur_outtemp = $current.outTemp.raw
 #else
@@ -69,7 +71,6 @@
     <span class="term_dot red"></span>
     <span class="term_dot amber"></span>
     <span class="term_dot green"></span>
-    <span class="term_path" id="shell-chrome-path">guest@${host_slug}:~$</span>
   </div>
   <div class="term_body">
 
@@ -80,7 +81,7 @@
          data-nav="$nav_current"
          data-default-theme="$default_theme"
          data-station-location="$station.location"
-         data-station-hardware="$station.hardware"
+         data-station-hardware="$hardware_display"
          data-station-version="$station.version"
          data-station-os-uptime="$station.os_uptime.long_form"
          data-station-weewx-uptime="$station.uptime.long_form"
@@ -138,6 +139,10 @@
       <a href="${rel}history.html"$cls_history>$gettext("History")</a>
       <a href="${rel}archive.html"$cls_archive>$gettext("Archive")</a>
       <a href="${rel}about.html"$cls_about>$gettext("About")</a>
+      #if $atproto_url
+      <a href="$atproto_url">$gettext("ATPROTO")</a>
+      #end if
+      <a href="${rel}current.json">$gettext("JSON")</a>
       #if $to_bool($DisplayOptions.get('show_rss', True))
       <a href="${rel}rss.xml">$gettext("RSS")</a>
       #end if
@@ -145,5 +150,6 @@
         $gettext("Safe Mode")
       </button>
     </nav>
+    #include "theme-toggle.inc"
   </div>
 </div>

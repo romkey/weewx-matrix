@@ -13,11 +13,15 @@
   var THEME_KEY = "matrix-theme";
   var reduceMotion = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var prefersLight = window.matchMedia &&
-    window.matchMedia("(prefers-color-scheme: light)").matches;
+  var prefersLightMq = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: light)")
+    : null;
   var rainTimer = null;
 
   function getTheme() {
+    if (window.MatrixTheme && window.MatrixTheme.get) {
+      return window.MatrixTheme.get();
+    }
     try {
       var t = localStorage.getItem(THEME_KEY);
       if (t === "safe" || t === "matrix") {
@@ -29,23 +33,17 @@
   }
 
   function setTheme(theme) {
+    if (window.MatrixTheme && window.MatrixTheme.set) {
+      window.MatrixTheme.set(theme);
+      applyThemeEffects(getTheme());
+      return;
+    }
     theme = theme === "safe" ? "safe" : "matrix";
     document.documentElement.dataset.theme = theme;
     try {
       localStorage.setItem(THEME_KEY, theme);
     } catch (e) { /* ignore */ }
-    updateToggle(theme);
     applyThemeEffects(theme);
-  }
-
-  function updateToggle(theme) {
-    var btn = document.getElementById("theme-toggle");
-    if (!btn) {
-      return;
-    }
-    var isSafe = theme === "safe";
-    btn.setAttribute("aria-pressed", isSafe ? "true" : "false");
-    btn.textContent = isSafe ? btn.getAttribute("data-label-matrix") || "Matrix Mode" : btn.getAttribute("data-label-safe") || "Safe Mode";
   }
 
   function applyThemeEffects(theme) {
@@ -59,7 +57,7 @@
   }
 
   function swapPlots(useLight) {
-    if (!prefersLight.matches) {
+    if (!prefersLightMq || !prefersLightMq.matches) {
       return;
     }
     document.querySelectorAll("img[data-plot-light]").forEach(function (img) {
@@ -185,23 +183,19 @@
   }
 
   function initThemeToggle() {
-    var btn = document.getElementById("theme-toggle");
-    if (!btn) {
-      return;
-    }
-    if (!btn.getAttribute("data-label-safe")) {
-      btn.setAttribute("data-label-safe", btn.textContent.trim());
-    }
-    btn.setAttribute("data-label-matrix", "Matrix Mode");
-    var theme = getTheme();
-    setTheme(theme);
-    btn.addEventListener("click", function () {
-      setTheme(getTheme() === "safe" ? "matrix" : "safe");
+    applyThemeEffects(getTheme());
+    window.addEventListener("matrix-theme-change", function () {
+      applyThemeEffects(getTheme());
     });
-    if (prefersLight.addEventListener) {
-      prefersLight.addEventListener("change", function () {
+    if (prefersLightMq) {
+      var onSchemeChange = function () {
         applyThemeEffects(getTheme());
-      });
+      };
+      if (prefersLightMq.addEventListener) {
+        prefersLightMq.addEventListener("change", onSchemeChange);
+      } else if (prefersLightMq.addListener) {
+        prefersLightMq.addListener(onSchemeChange);
+      }
     }
   }
 

@@ -92,6 +92,7 @@ jobs:
         run: |
           HTML_ROOT="$RUNNER_TEMP/station/public_html"
           python -m json.tool "$HTML_ROOT/shell-data.json" > /dev/null
+          python -m json.tool "$HTML_ROOT/current.json" > /dev/null
           test -f "$HTML_ROOT/index.html"
           test -f "$HTML_ROOT/static/shell.js"
           ls "$HTML_ROOT"/daytempdew.png "$HTML_ROOT"/daytempdew_light.png

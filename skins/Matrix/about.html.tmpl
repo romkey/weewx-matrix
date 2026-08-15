@@ -3,6 +3,7 @@
 #encoding UTF-8
 #set global $rel = ""
 #set global $nav_current = "about"
+#set $hardware_display = $Extras.get('hardware_name', '') or $station.hardware
 <!DOCTYPE html>
 <html lang="$lang">
 <head>
@@ -30,7 +31,7 @@
           </div>
           <div class="readout">
             <span class="label">$gettext("Hardware")</span>
-            <span class="value">$station.hardware</span>
+            <span class="value">$hardware_display</span>
           </div>
           <div class="readout">
             <span class="label">$gettext("Latitude")</span>
