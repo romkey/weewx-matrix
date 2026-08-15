@@ -4,6 +4,7 @@ import configobj
 import glob
 import importlib.util
 import os
+import tempfile
 import unittest
 
 
@@ -22,8 +23,24 @@ def _load_installer():
 class TestMatrixExtension(unittest.TestCase):
     def test_skin_files_exist(self):
         module = _load_installer()
-        for path in module._skin_files():
+        paths = module._skin_files()
+        self.assertGreater(len(paths), 0)
+        for path in paths:
             self.assertTrue(os.path.isfile(os.path.join(ROOT, path)), path)
+
+    def test_cached_installer_has_no_skin_tree(self):
+        with tempfile.TemporaryDirectory() as cached_root:
+            cached_install = os.path.join(cached_root, 'install.py')
+            with open(os.path.join(ROOT, 'install.py'), encoding='utf-8') as src:
+                contents = src.read()
+            with open(cached_install, 'w', encoding='utf-8') as dst:
+                dst.write(contents)
+
+            spec = importlib.util.spec_from_file_location('cached_install', cached_install)
+            cached = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(cached)
+            self.assertEqual(cached._skin_files(), [])
+            cached.loader()  # must not raise when skins/ is absent
 
     def test_required_fonts_present(self):
         for name in ('ShareTechMono-Regular.ttf', 'VT323-Regular.ttf'):

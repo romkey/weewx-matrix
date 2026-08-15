@@ -19,7 +19,10 @@ def _skin_files():
     root = os.path.dirname(os.path.abspath(__file__))
     skin_root = os.path.join(root, 'skins', SKIN)
     if not os.path.isdir(skin_root):
-        raise RuntimeError(f'Missing skin directory: skins/{SKIN}/')
+        # WeeWX keeps a copy of install.py under bin/user/installer/. That
+        # cached copy has no skins/ tree; listing or uninstalling the
+        # extension must not require re-walking the source package.
+        return []
 
     paths = []
     for dirpath, _dirnames, filenames in os.walk(skin_root):
