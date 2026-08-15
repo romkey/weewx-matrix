@@ -19,31 +19,18 @@
   var rainTimer = null;
 
   function getTheme() {
-    if (window.MatrixTheme && window.MatrixTheme.get) {
-      return window.MatrixTheme.get();
-    }
     try {
       var t = localStorage.getItem(THEME_KEY);
       if (t === "safe" || t === "matrix") {
         return t;
       }
     } catch (e) { /* ignore */ }
+    var current = document.documentElement.getAttribute("data-theme");
+    if (current === "safe" || current === "matrix") {
+      return current;
+    }
     var toggle = document.getElementById("theme-toggle");
     return (toggle && toggle.getAttribute("data-default-theme")) || "matrix";
-  }
-
-  function setTheme(theme) {
-    if (window.MatrixTheme && window.MatrixTheme.set) {
-      window.MatrixTheme.set(theme);
-      applyThemeEffects(getTheme());
-      return;
-    }
-    theme = theme === "safe" ? "safe" : "matrix";
-    document.documentElement.dataset.theme = theme;
-    try {
-      localStorage.setItem(THEME_KEY, theme);
-    } catch (e) { /* ignore */ }
-    applyThemeEffects(theme);
   }
 
   function applyThemeEffects(theme) {
@@ -88,7 +75,7 @@
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
-      canvas.style.display = "none";
+      canvas.style.removeProperty("display");
     }
   }
 
@@ -97,7 +84,7 @@
     if (!canvas || reduceMotion || getTheme() === "safe") {
       return;
     }
-    canvas.style.display = "";
+    canvas.style.removeProperty("display");
     if (rainTimer !== null) {
       return;
     }
@@ -184,8 +171,8 @@
 
   function initThemeToggle() {
     applyThemeEffects(getTheme());
-    window.addEventListener("matrix-theme-change", function () {
-      applyThemeEffects(getTheme());
+    window.addEventListener("matrix-theme-change", function (e) {
+      applyThemeEffects((e.detail && e.detail.theme) || getTheme());
     });
     if (prefersLightMq) {
       var onSchemeChange = function () {
@@ -204,11 +191,6 @@
       return;
     }
     window.location.href = prefix + value + ".html";
-  };
-
-  window.MatrixTheme = {
-    get: getTheme,
-    set: setTheme
   };
 
   function setup() {
