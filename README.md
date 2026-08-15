@@ -13,9 +13,11 @@ lets you browse every month and year your station has ever recorded.
 
 - **Live dashboard** — current conditions in a `cat /var/status/uplink`-style readout,
   plus 24-hour plots.
-- **Extended sensor support** — UV, solar radiation, air quality (PM1.0 / PM2.5 / PM10.0),
-  and lightning, each with color-coded threat-level badges. Extended panels are gated on
-  `has_data`, so stations without those sensors simply omit the sections.
+- **Extended sensor support** — UV, solar radiation, particulates (PM1.0 / PM2.5 / PM10.0),
+  AQI, ozone, NO2, SO2, CO, tree and grass pollen, sound level, and lightning, each with
+  color-coded threat-level badges using EPA and National Allergy Bureau bands. Extended
+  panels are gated on `has_data`, so stations without those sensors simply omit the
+  sections. The skin README documents the field name each card reads.
 - **Historical data viewer** — tabbed Day/Week/Month/Year plots plus a statistics
   comparison table.
 - **Deep archive** — every calendar month and year gets its own generated page with log

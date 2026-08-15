@@ -12,12 +12,14 @@ station has ever recorded.
 
 - **Live dashboard** (`/`) — current conditions in a `cat
   /var/status/uplink`-style readout, plus 24-hour plots.
-- **Extended sensor support** — UV index and air quality (PM1.0 / PM2.5 /
-  PM10.0), plus solar radiation and lightning, each rendered with
-  color-coded "threat level" badges. Every extended block is individually
-  gated on `has_data`, so a station with none of these sensors simply won't
-  show the panel at all — no errors, no empty boxes, no configuration
-  required.
+- **Extended sensor support** — UV index, solar radiation, particulates
+  (PM1.0 / PM2.5 / PM10.0), AQI, ozone, nitrogen dioxide, sulfur dioxide,
+  carbon monoxide, tree and grass pollen, sound level, and lightning, each
+  rendered with color-coded "threat level" badges. Every extended block is
+  individually gated on `has_data`, so a station with none of these sensors
+  simply won't show the panel at all — no errors, no empty boxes, no
+  configuration required. See [Extended sensor
+  cards](#extended-sensor-cards) for the field names and threat bands.
 - **Historical data viewer** (`/history/`) — tabbed Day/Week/Month/Year
   plots plus a side-by-side statistics comparison table.
 - **Deep archive** (`/archive/`) — every calendar month and year in the
@@ -92,14 +94,62 @@ To add a brand-new plot, follow the pattern already used in
 `skin.conf`'s `[ImageGenerator]` section (one stanza per period, e.g.
 `day_images`, `week_images`, ...).
 
-### Air Quality Index
+### Extended sensor cards
 
-The "Air Quality" card on the dashboard estimates an AQI category directly
-from PM2.5 concentration (using standard EPA breakpoints) — no extra plugin
-required, as long as your station or driver populates `pm2_5`. If you use a
-dedicated AQI add-on (such as `weewx-aqi`) with its own data binding, you
-can extend `sensors.inc` to pull from it; see the comments in that file for
-where to hook in.
+Every card in the "Extended Sensor Array" is gated on `has_data`, so it
+appears only if your database actually has readings for that observation.
+A station with none of them doesn't render the panel at all.
+
+Most of these read WeeWX's standard observation names, which already exist in
+the default `wview_extended` schema — you only need something populating them:
+
+| Card | Field | Units | Threat bands |
+| --- | --- | --- | --- |
+| UV Index | `UV` | index | WHO UV index categories |
+| Solar Radiation | `radiation` | W/m² | none (reading only) |
+| Air Quality | `pm2_5`, `pm10_0`, `pm1_0` | µg/m³ | EPA AQI breakpoints for PM2.5 |
+| Ozone | `o3` | ppm | EPA 8-hour AQI breakpoints |
+| Nitrogen Dioxide | `no2` | µg/m³ | EPA 1-hour AQI breakpoints |
+| Sulfur Dioxide | `so2` | ppm | EPA 1-hour AQI breakpoints |
+| Carbon Monoxide | `co` | ppm | EPA 8-hour AQI breakpoints |
+| Sound Level | `noise` | dB | hearing-risk bands (85 dB NIOSH limit) |
+| Lightning | `lightning_strike_count`, `lightning_distance` | count, distance | none (reading only) |
+
+Three cards use field names that are **not** part of the standard schema, so
+you have to add the columns yourself before they can appear:
+
+| Card | Field | Units | Threat bands |
+| --- | --- | --- | --- |
+| Air Quality Index | `aqi` | index 0–500 | EPA AQI categories |
+| Tree Pollen | `pollen_tree` | grains/m³ | National Allergy Bureau, tree scale |
+| Grass Pollen | `pollen_grass` | grains/m³ | National Allergy Bureau, grass scale |
+
+```
+weectl database add-column aqi --type REAL
+weectl database add-column pollen_tree --type REAL
+weectl database add-column pollen_grass --type REAL
+```
+
+Then point something at them — a driver, an MQTT topic via `MQTTSubscribe`, or
+a service that fetches from an air-quality or pollen API.
+
+The EPA publishes its ozone, SO2, and NO2 breakpoints in parts per billion,
+but WeeWX stores `o3` and `so2` as `group_fraction` (ppm) and `no2` as
+`group_concentration` (µg/m³), and defines no conversion between them. The
+thresholds in `sensors.inc` are therefore written in the units WeeWX actually
+stores, with NO2 converted using the standard 1 ppb = 1.88 µg/m³ at 25 °C. If
+your sensor reports different units, edit the bounds lists at the top of
+`sensors.inc` to match.
+
+The pollen bands differ between tree and grass because the National Allergy
+Bureau scales differ: grass counts run an order of magnitude lower than tree
+counts for the same severity.
+
+The "Air Quality" card estimates a category from PM2.5 directly, so it works
+without an AQI feed. It is kept alongside the `aqi` card so you can see the
+particulate readings and a real index side by side. If you use a dedicated AQI
+add-on such as `weewx-aqi` with its own data binding, see the comments at the
+top of `sensors.inc` for where to pull from it instead.
 
 ## File layout
 

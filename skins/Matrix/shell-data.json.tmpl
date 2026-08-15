@@ -4,7 +4,7 @@
 #set $history_days = int($Extras.get('shell_history_days', 120))
 #set $span_days = $span(day_delta=$history_days, boundary='midnight')
 #set $sensor_names = []
-#for $obs in ['outTemp','dewpoint','windchill','heatindex','outHumidity','barometer','pressure','windSpeed','windGust','windDir','rain','rainRate','inTemp','inHumidity','UV','radiation','pm1_0','pm2_5','pm10_0','lightning_strike_count','lightning_distance']
+#for $obs in ['outTemp','dewpoint','windchill','heatindex','outHumidity','barometer','pressure','windSpeed','windGust','windDir','rain','rainRate','inTemp','inHumidity','UV','radiation','pm1_0','pm2_5','pm10_0','aqi','o3','no2','so2','co','pollen_tree','pollen_grass','noise','lightning_strike_count','lightning_distance']
 #if $getVar('year.%s.has_data' % $obs, False)
 #set $void = $sensor_names.append($obs)
 #end if
