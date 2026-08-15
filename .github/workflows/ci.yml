@@ -117,7 +117,7 @@ jobs:
       - name: Create extension zip
         run: |
           mkdir -p dist
-          VERSION=$(python -c "import importlib.util; spec=importlib.util.spec_from_file_location('install','install.py'); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m); print(m.VERSION)")
+          VERSION=$(python -c "import ast; tree=ast.parse(open('install.py').read()); print(next(node.value.value for node in tree.body if isinstance(node, ast.Assign) and any(getattr(t, 'id', None) == 'VERSION' for t in node.targets)))")
           ARCHIVE="dist/weewx-matrix-${VERSION}.zip"
           rm -f "$ARCHIVE"
           zip -r "$ARCHIVE" . \
