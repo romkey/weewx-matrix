@@ -74,14 +74,34 @@ jobs:
           test -f "$RUNNER_TEMP/station/skins/Matrix/skin.conf"
           test -f "$RUNNER_TEMP/station/skins/Matrix/static/matrix.css"
 
+      - name: Seed archive data for report generation
+        run: |
+          timeout 3 weewxd --config="$RUNNER_TEMP/station/weewx.conf" || true
+          DB="$RUNNER_TEMP/station/archive/weewx.sdb"
+          NOW=$(date +%s)
+          for OFFSET in $(seq 0 3600 172800); do
+            TS=$((NOW - OFFSET))
+            sqlite3 "$DB" "INSERT OR IGNORE INTO archive (dateTime, usUnits, interval, outTemp, outHumidity, barometer, windSpeed, windDir, rain, rainRate, dewpoint, windGust, pressure) VALUES ($TS, 1, 5, 72.5, 55.0, 30.05, 8.5, 180.0, 0.01, 0.0, 55.0, 12.0, 30.05);"
+          done
+          timeout 15 weewxd --config="$RUNNER_TEMP/station/weewx.conf" || true
+
       - name: Generate a report
         run: weectl report run MatrixReport --config="$RUNNER_TEMP/station/weewx.conf"
+
+      - name: Validate generated shell data and light plots
+        run: |
+          HTML_ROOT="$RUNNER_TEMP/station/public_html"
+          python -m json.tool "$HTML_ROOT/shell-data.json" > /dev/null
+          test -f "$HTML_ROOT/index.html"
+          test -f "$HTML_ROOT/static/shell.js"
+          ls "$HTML_ROOT"/daytempdew.png "$HTML_ROOT"/daytempdew_light.png
 
       - name: Uninstall cleanly
         run: |
           weectl extension uninstall weewx-matrix -y --config="$RUNNER_TEMP/station/weewx.conf"
-          test ! -f "$RUNNER_TEMP/station/skins/Matrix/skin.conf"
-          ! grep -q 'MatrixReport' "$RUNNER_TEMP/station/weewx.conf"
+          weectl extension list --config="$RUNNER_TEMP/station/weewx.conf" | grep -qi weewx-matrix && exit 1 || true
+          ! grep -q '\[\[MatrixReport\]\]' "$RUNNER_TEMP/station/weewx.conf"
+          test ! -d "$RUNNER_TEMP/station/bin/user/installer/weewx-matrix"
 
   package:
     name: build release archive

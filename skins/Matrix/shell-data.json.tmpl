@@ -1,0 +1,120 @@
+## shell-data.json.tmpl -- cached weather data for the interactive shell
+#errorCatcher Echo
+#set $history_days = int($Extras.get('shell_history_days', 120))
+#set $span_days = $span(day_delta=$history_days, boundary='midnight')
+#set $sensor_names = []
+#for $obs in ['outTemp','dewpoint','windchill','heatindex','outHumidity','barometer','pressure','windSpeed','windGust','windDir','rain','rainRate','inTemp','inHumidity','UV','radiation','pm1_0','pm2_5','pm10_0','lightning_strike_count','lightning_distance']
+#if $getVar('year.%s.has_data' % $obs, False)
+#set $void = $sensor_names.append($obs)
+#end if
+#end for
+#set $archive_months = list(reversed(list($SummaryByMonth)))
+#set $archive_years = list(reversed(list($SummaryByYear)))
+#set $day_rows = []
+#for $d in $span_days.days
+#if $d.outTemp.has_data or $d.rain.has_data or $d.wind.has_data
+#set $void = $day_rows.append($d)
+#end if
+#end for
+{
+  "generated": "$current.dateTime.format('%Y-%m-%dT%H:%M:%S', add_label=False)",
+  "station": {
+    "location": "$station.location",
+    "hardware": "$station.hardware",
+    "latitude": "$station.latitude[0]° $station.latitude[1]' $station.latitude[2]",
+    "longitude": "$station.longitude[0]° $station.longitude[1]' $station.longitude[2]",
+    "altitude": "$station.altitude",
+    "version": "$station.version",
+    "os_uptime": "$station.os_uptime.long_form",
+    "weewx_uptime": "$station.uptime.long_form",
+    "skin": "$SKIN_NAME $SKIN_VERSION"
+  },
+  "current": {
+    "dateTime": "$current.dateTime",
+    "outTemp_fmt": "$current.outTemp",
+    "dewpoint_fmt": "$current.dewpoint",
+    "outHumidity_fmt": "$current.outHumidity",
+    "barometer_fmt": "$current.barometer",
+    "windSpeed_fmt": "$current.windSpeed",
+    "windDir_compass": "$current.windDir.ordinal_compass",
+    "rainRate_fmt": "$current.rainRate"
+  },
+  "trend": {
+    "barometer": "$trend.barometer.formatted"
+  },
+  "aggregates": {
+    "day": {
+      "rain_fmt": "$day.rain.sum",
+      "outTemp_max_fmt": "$day.outTemp.max",
+      "outTemp_min_fmt": "$day.outTemp.min",
+      "outTemp_avg_fmt": "$day.outTemp.avg",
+      "wind_max_fmt": "$day.wind.max",
+      "UV_max_fmt": "$day.UV.max"
+    },
+    "week": {
+      "rain_fmt": "$week.rain.sum",
+      "outTemp_max_fmt": "$week.outTemp.max",
+      "outTemp_min_fmt": "$week.outTemp.min"
+    },
+    "month": {
+      "rain_fmt": "$month.rain.sum",
+      "outTemp_max_fmt": "$month.outTemp.max",
+      "outTemp_min_fmt": "$month.outTemp.min"
+    },
+    "year": {
+      "rain_fmt": "$year.rain.sum",
+      "outTemp_max_fmt": "$year.outTemp.max",
+      "outTemp_min_fmt": "$year.outTemp.min"
+    },
+    "rainyear": {
+      "rain_fmt": "$rainyear.rain.sum"
+    }
+  },
+  "records": {
+    "outTemp_max_time": "$record.outTemp.maxtime",
+    "outTemp_min_time": "$record.outTemp.mintime",
+    "rain_max_time": "$record.rain.maxtime",
+    "wind_max_time": "$record.wind.maxtime",
+    "barometer_max_time": "$record.barometer.maxtime",
+    "barometer_min_time": "$record.barometer.mintime"
+  },
+  "sensors": [
+#for $i, $obs in enumerate($sensor_names)
+    "$obs"#if $i < len($sensor_names) - 1
+,#end if
+#end for
+  ],
+  "archive": {
+    "months": [
+#for $i, $monthYear in enumerate($archive_months)
+      "$monthYear"#if $i < len($archive_months) - 1
+,#end if
+#end for
+    ],
+    "years": [
+#for $i, $yr in enumerate($archive_years)
+      "$yr"#if $i < len($archive_years) - 1
+,#end if
+#end for
+    ]
+  },
+  "days": [
+#for $i, $d in enumerate($day_rows)
+    {
+      "date": "$d.dateTime.format('%Y-%m-%d', add_label=False)",
+      "label": "$d.dateTime.format('%a %Y-%m-%d', add_label=False)",
+      "outTemp_avg_fmt": "$d.outTemp.avg",
+      "outTemp_max_fmt": "$d.outTemp.max",
+      "outTemp_min_fmt": "$d.outTemp.min",
+      "rain_fmt": "$d.rain.sum",
+      "wind_avg_fmt": "$d.wind.avg",
+      "wind_max_fmt": "$d.wind.max",
+      "humidity_avg_fmt": "$d.outHumidity.avg",
+      "barometer_avg_fmt": "$d.barometer.avg",
+      "UV_max_fmt": "$d.UV.max",
+      "pm2_5_avg_fmt": "$d.pm2_5.avg"
+    }#if $i < len($day_rows) - 1
+,#end if
+#end for
+  ]
+}

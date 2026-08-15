@@ -8,6 +8,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  #include "theme-init.inc"
   <title>$gettext("System Info") :: $station.location :: MATRIX_OS</title>
   <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
   <link rel="stylesheet" href="static/matrix.css">
@@ -72,5 +73,8 @@
   </div>
 
   <script src="static/matrix.js" defer></script>
+  #if $to_bool($Extras.get('enable_shell', True))
+  <script src="static/shell.js" defer></script>
+  #end if
 </body>
 </html>

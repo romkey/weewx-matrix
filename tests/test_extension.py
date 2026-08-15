@@ -66,6 +66,8 @@ class TestMatrixExtension(unittest.TestCase):
             'archive.html.tmpl',
             'about.html.tmpl',
             'rss.xml.tmpl',
+            'shell-data.json.tmpl',
+            'theme-init.inc',
             'archive/month-%Y-%m.html.tmpl',
             'archive/year-%Y.html.tmpl',
         )
@@ -75,9 +77,52 @@ class TestMatrixExtension(unittest.TestCase):
                 self.assertTrue(os.path.getsize(path) > 0, name)
 
     def test_static_assets_exist(self):
-        for name in ('matrix.css', 'matrix.js', 'favicon.svg'):
+        for name in ('matrix.css', 'matrix.js', 'shell.js', 'favicon.svg'):
             path = os.path.join(SKIN_DIR, 'static', name)
             self.assertTrue(os.path.isfile(path), name)
+
+    def test_new_templates_exist(self):
+        for name in ('shell-data.json.tmpl', 'theme-init.inc'):
+            path = os.path.join(SKIN_DIR, name)
+            self.assertTrue(os.path.isfile(path), name)
+
+    def test_light_plot_stanzas_exist(self):
+        conf = configobj.ConfigObj(
+            os.path.join(SKIN_DIR, 'skin.conf'),
+            encoding='utf-8',
+            file_error=True,
+        )
+        plot_groups_raw = conf['DisplayOptions']['plot_groups']
+        if isinstance(plot_groups_raw, list):
+            plot_groups = plot_groups_raw
+        else:
+            plot_groups = [g.strip() for g in plot_groups_raw.split(',')]
+        periods_raw = conf['DisplayOptions']['periods']
+        if isinstance(periods_raw, list):
+            periods = periods_raw
+        else:
+            periods = [p.strip() for p in periods_raw.split(',')]
+        image_gen = conf['ImageGenerator']
+        for period in periods:
+            section = f'{period}_images'
+            light_section = f'{period}_images_light'
+            self.assertIn(section, image_gen, section)
+            self.assertIn(light_section, image_gen, light_section)
+            for group in plot_groups:
+                plot = f'{period}{group}'
+                self.assertIn(plot, image_gen[section], plot)
+                self.assertIn(f'{plot}_light', image_gen[light_section], f'{plot}_light')
+
+    def test_shell_options_in_extras(self):
+        conf = configobj.ConfigObj(
+            os.path.join(SKIN_DIR, 'skin.conf'),
+            encoding='utf-8',
+            file_error=True,
+        )
+        self.assertIn('enable_shell', conf['Extras'])
+        self.assertIn('default_theme', conf['Extras'])
+        self.assertIn('shell_history_days', conf['Extras'])
+        self.assertEqual(conf['SKIN_VERSION'], '1.1.0')
 
 
 if __name__ == '__main__':

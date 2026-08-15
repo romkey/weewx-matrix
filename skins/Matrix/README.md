@@ -31,6 +31,11 @@ station has ever recorded.
 - Digital-rain canvas background, CRT scanline overlay, and a live clock,
   all in a single small JS file with no dependencies. Respects
   `prefers-reduced-motion`.
+- **Safe Mode** — nav toggle for a static, accessible layout (system dark-mode
+  aware) with light-palette plots on light-color-scheme systems.
+- **Interactive shell** — type commands in the title bar (`wx`, `ls days/`,
+  `plot outTemp`, `rm -rf /`, …). Hidden in Safe Mode. See the
+  [project README](../../README.md) for options and command list.
 
 ## Requirements
 

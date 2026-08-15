@@ -1,3 +1,12 @@
+1.1.0 — 2026-08-14
+  Safe Mode theme toggle: static, high-contrast UI honoring system dark mode.
+  Light-palette plot set for Safe Mode on light-color-scheme systems.
+  Interactive weather shell in the title bar with pipes, virtual filesystem,
+  and easter eggs (including rm -rf /).
+  shell-data.json export for shell history commands.
+  New [Extras] options: enable_shell, default_theme, shell_history_days.
+  Static assets now copy_always so upgrades pick up CSS/JS changes.
+
 1.0.0 — 2026-08-14
   Initial release.
   - Live dashboard with phosphor-green terminal styling and digital rain.

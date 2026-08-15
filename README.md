@@ -25,6 +25,11 @@ lets you browse every month and year your station has ever recorded.
   internet connection required to view reports.
 - **Digital rain** — canvas background, CRT scanline overlay, and live clock in a single
   small JS file with no dependencies. Respects `prefers-reduced-motion`.
+- **Safe Mode** — a nav toggle for a static, high-contrast layout that honors system dark
+  mode, stops animation, and swaps to a light-palette plot set on light-color-scheme systems.
+- **Interactive shell** — a live terminal in the title bar with pipes, a virtual weather
+  filesystem, `wx`/`plot`/`oracle` commands, and easter eggs (`rm -rf /`, `red pill`, …).
+  Hidden in Safe Mode.
 
 ## Requirements
 
@@ -109,7 +114,40 @@ Example — add another extended sensor in `weewx.conf`:
 ```
 
 See [skins/Matrix/README.md](skins/Matrix/README.md) for file layout, air-quality notes,
-and tips for skin developers.
+shell command reference, and tips for skin developers.
+
+### Safe Mode and shell options
+
+Under `[StdReport] / [[MatrixReport]] / [[[Extras]]]` in `weewx.conf`:
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| `enable_shell` | `true` | Show the interactive shell in Matrix mode |
+| `default_theme` | `matrix` | Starting theme: `matrix` or `safe` |
+| `shell_history_days` | `120` | Days of daily summaries exported to `shell-data.json` |
+
+Example:
+
+```ini
+[StdReport]
+    [[MatrixReport]]
+        skin = Matrix
+        enable = true
+        [[[Extras]]]
+            enable_shell = true
+            default_theme = matrix
+            shell_history_days = 90
+```
+
+### Shell commands (highlights)
+
+| Category | Commands |
+| --- | --- |
+| Weather | `wx`, `temp`, `wind`, `rain`, `baro`, `stats`, `records`, `plot`, `oracle`, `sensors` |
+| Files | `ls`, `cd`, `cat`, `grep`, `sort`, `head`, `tail`, `find` (try `cat days/*.log \\| grep rain`) |
+| Fun | `rm -rf /`, `red pill`, `blue pill`, `sudo make me a sandwich`, `fortune`, `cowsay`, `glitch` |
+
+Type `help` in the shell for the full list.
 
 ## Development
 
