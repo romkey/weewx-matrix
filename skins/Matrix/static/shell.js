@@ -433,6 +433,110 @@
     this.outputEl.scrollTop = this.outputEl.scrollHeight;
   };
 
+  Shell.prototype.ensureMirror = function () {
+    if (!this._mirror) {
+      this._mirror = document.createElement("span");
+      this._mirror.setAttribute("aria-hidden", "true");
+      this._mirror.style.cssText = "position:fixed;top:0;left:-9999px;visibility:hidden;white-space:pre;border:0;padding:0;margin:0;";
+      document.body.appendChild(this._mirror);
+    }
+    return this._mirror;
+  };
+
+  Shell.prototype.textWidthBeforeCaret = function (input, pos, style) {
+    var mirror = this.ensureMirror();
+    mirror.style.font = style.font;
+    mirror.style.fontSize = style.fontSize;
+    mirror.style.fontFamily = style.fontFamily;
+    mirror.style.fontWeight = style.fontWeight;
+    mirror.style.fontStyle = style.fontStyle;
+    mirror.style.letterSpacing = style.letterSpacing;
+    mirror.style.lineHeight = style.lineHeight;
+    mirror.textContent = input.value.substring(0, pos);
+    return mirror.getBoundingClientRect().width;
+  };
+
+  Shell.prototype.focusInput = function () {
+    if (!this.inputEl || document.documentElement.getAttribute("data-theme") === "safe") {
+      return;
+    }
+    try {
+      this.inputEl.focus({ preventScroll: true });
+    } catch (e) {
+      this.inputEl.focus();
+    }
+  };
+
+  Shell.prototype.scheduleFocus = function () {
+    var self = this;
+    var attempt = function () {
+      self.focusInput();
+      self.updateCursor();
+    };
+    attempt();
+    window.requestAnimationFrame(attempt);
+    window.addEventListener("load", attempt, { once: true });
+    setTimeout(attempt, 50);
+    setTimeout(attempt, 250);
+  };
+
+  Shell.prototype.bindGlobalTyping = function () {
+    var self = this;
+    document.addEventListener("keydown", function (e) {
+      if (document.documentElement.getAttribute("data-theme") === "safe" || !self.inputEl) {
+        return;
+      }
+      if (e.target === self.inputEl) {
+        return;
+      }
+      if (e.target && e.target.closest && e.target.closest("input, textarea, select, button, a")) {
+        return;
+      }
+      if (e.metaKey || e.ctrlKey || e.altKey) {
+        return;
+      }
+      if (e.key === "Tab" || e.key === "Escape" || e.key.indexOf("Arrow") === 0 || e.key.indexOf("F") === 0) {
+        return;
+      }
+
+      self.focusInput();
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        self.onSubmit(self.inputEl.value);
+        self.inputEl.value = "";
+        self.updateCursor();
+        return;
+      }
+
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        var bsStart = self.inputEl.selectionStart || 0;
+        var bsEnd = self.inputEl.selectionEnd || 0;
+        var bsVal = self.inputEl.value;
+        if (bsStart !== bsEnd) {
+          self.inputEl.value = bsVal.slice(0, bsStart) + bsVal.slice(bsEnd);
+          self.inputEl.selectionStart = self.inputEl.selectionEnd = bsStart;
+        } else if (bsStart > 0) {
+          self.inputEl.value = bsVal.slice(0, bsStart - 1) + bsVal.slice(bsStart);
+          self.inputEl.selectionStart = self.inputEl.selectionEnd = bsStart - 1;
+        }
+        self.updateCursor();
+        return;
+      }
+
+      if (e.key.length === 1) {
+        e.preventDefault();
+        var start = self.inputEl.selectionStart || 0;
+        var end = self.inputEl.selectionEnd || 0;
+        var val = self.inputEl.value;
+        self.inputEl.value = val.slice(0, start) + e.key + val.slice(end);
+        self.inputEl.selectionStart = self.inputEl.selectionEnd = start + 1;
+        self.updateCursor();
+      }
+    }, true);
+  };
+
   Shell.prototype.updateCursor = function () {
     if (!this.inputEl || !this.cursorEl) {
       return;
@@ -444,20 +548,8 @@
       pos = input.value.length;
     }
     var style = window.getComputedStyle(input);
-    if (!this._cursorMeasure) {
-      this._cursorMeasure = document.createElement("span");
-      this._cursorMeasure.className = "shell_cursor_measure";
-      this._cursorMeasure.setAttribute("aria-hidden", "true");
-      input.parentNode.appendChild(this._cursorMeasure);
-    }
-    var measure = this._cursorMeasure;
-    measure.style.font = style.font;
-    measure.style.fontSize = style.fontSize;
-    measure.style.fontFamily = style.fontFamily;
-    measure.style.fontWeight = style.fontWeight;
-    measure.style.letterSpacing = style.letterSpacing;
-    measure.style.lineHeight = style.lineHeight;
-    measure.textContent = input.value.substring(0, pos) || "\u200b";
+    var textWidth = this.textWidthBeforeCaret(input, pos, style);
+    var borderLeft = parseFloat(style.borderLeftWidth) || 0;
 
     var padTop = parseFloat(style.paddingTop) || 0;
     var padLeft = parseFloat(style.paddingLeft) || 0;
@@ -473,9 +565,9 @@
     var top = padTop + Math.max(0, (inputHeight - padTop - padBottom - lineHeight) / 2);
 
     cursor.style.top = top + "px";
-    cursor.style.left = (padLeft + measure.offsetWidth) + "px";
+    cursor.style.left = (borderLeft + padLeft + textWidth) + "px";
     cursor.style.height = lineHeight + "px";
-    cursor.style.opacity = document.activeElement === input ? "1" : "0";
+    cursor.style.display = document.activeElement === input ? "inline-block" : "none";
   };
 
   Shell.prototype.bindCursor = function () {
@@ -492,23 +584,13 @@
     window.addEventListener("resize", sync);
     window.addEventListener("matrix-theme-change", function (e) {
       if (e.detail && e.detail.theme === "matrix") {
-        try {
-          self.inputEl.focus({ preventScroll: true });
-        } catch (err) {
-          self.inputEl.focus();
-        }
+        self.scheduleFocus();
+      } else {
+        sync();
       }
-      sync();
     });
     sync();
-    if (document.documentElement.getAttribute("data-theme") !== "safe") {
-      try {
-        this.inputEl.focus({ preventScroll: true });
-      } catch (err) {
-        this.inputEl.focus();
-      }
-      sync();
-    }
+    self.scheduleFocus();
   };
 
   Shell.prototype.updatePrompt = function () {
@@ -1145,6 +1227,7 @@
     var self = this;
     this.updatePrompt();
     this.bindCursor();
+    this.bindGlobalTyping();
 
     this.formEl.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -1160,15 +1243,18 @@
         if (self.histIdx > 0) {
           self.histIdx--;
           self.inputEl.value = self.history[self.histIdx] || "";
+          self.updateCursor();
         }
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
         if (self.histIdx < self.history.length - 1) {
           self.histIdx++;
           self.inputEl.value = self.history[self.histIdx] || "";
+          self.updateCursor();
         } else {
           self.histIdx = self.history.length;
           self.inputEl.value = "";
+          self.updateCursor();
         }
       } else if (e.key === "l" && e.ctrlKey) {
         e.preventDefault();
@@ -1197,7 +1283,7 @@
 
   function initShell() {
     var el = document.querySelector("[data-shell]");
-    if (!el || document.documentElement.dataset.theme === "safe") {
+    if (!el || document.documentElement.getAttribute("data-theme") === "safe") {
       return;
     }
     var shell = new Shell(el);

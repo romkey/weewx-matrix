@@ -659,6 +659,7 @@ footer.term_footer a {
   flex: 1;
   min-width: 0;
   width: 100%;
+  box-sizing: border-box;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -668,10 +669,16 @@ footer.term_footer a {
   line-height: 1.5;
   padding: 0;
   outline: none;
-  caret-color: transparent;
+  caret-color: transparent !important;
+  -webkit-text-fill-color: var(--matrix-green);
   box-shadow: none;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.shell_input:focus {
+  caret-color: transparent !important;
+  outline: none;
 }
 
 .shell_cursor {
@@ -681,23 +688,13 @@ footer.term_footer a {
   display: inline-block;
   width: 0.55em;
   min-width: 2px;
-  margin-left: 2px;
+  margin-left: 0;
   line-height: 1;
   color: transparent;
   overflow: hidden;
   pointer-events: none;
   transform: none;
-}
-
-.shell_cursor_measure {
-  position: absolute;
-  top: 0;
-  left: 0;
-  visibility: hidden;
-  white-space: pre;
-  pointer-events: none;
-  height: auto;
-  overflow: visible;
+  z-index: 1;
 }
 
 .theme-toggle {

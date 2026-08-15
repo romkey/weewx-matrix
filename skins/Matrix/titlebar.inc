@@ -115,7 +115,7 @@
           <span class="user">guest</span><span class="at">@</span><span class="host">$host_slug</span><span class="path" id="shell-prompt-path">:~$</span>
         </label>
         <span class="shell_input_wrap">
-          <input type="text" id="shell-input" class="shell_input" aria-label="Shell command input" autocapitalize="off" autocorrect="off">
+          <input type="text" id="shell-input" class="shell_input" aria-label="Shell command input" autocapitalize="off" autocorrect="off" autofocus>
           <span class="cursor shell_cursor" id="shell-cursor" aria-hidden="true">&nbsp;</span>
         </span>
       </form>
