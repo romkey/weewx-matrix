@@ -665,6 +665,8 @@ footer.term_footer a {
   background-color: transparent;
   color: var(--matrix-green);
   font: inherit;
+  line-height: 1.5;
+  padding: 0;
   outline: none;
   caret-color: transparent;
   box-shadow: none;
@@ -674,21 +676,28 @@ footer.term_footer a {
 
 .shell_cursor {
   position: absolute;
-  top: 50%;
   left: 0;
-  height: 1em;
-  margin-left: 0;
+  top: 0;
+  display: inline-block;
+  width: 0.55em;
+  min-width: 2px;
+  margin-left: 2px;
+  line-height: 1;
+  color: transparent;
+  overflow: hidden;
   pointer-events: none;
-  transform: translateY(-50%);
+  transform: none;
 }
 
 .shell_cursor_measure {
   position: absolute;
+  top: 0;
+  left: 0;
   visibility: hidden;
   white-space: pre;
   pointer-events: none;
-  height: 0;
-  overflow: hidden;
+  height: auto;
+  overflow: visible;
 }
 
 .theme-toggle {

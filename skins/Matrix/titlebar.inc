@@ -116,7 +116,7 @@
         </label>
         <span class="shell_input_wrap">
           <input type="text" id="shell-input" class="shell_input" aria-label="Shell command input" autocapitalize="off" autocorrect="off">
-          <span class="cursor shell_cursor" id="shell-cursor" aria-hidden="true"></span>
+          <span class="cursor shell_cursor" id="shell-cursor" aria-hidden="true">&nbsp;</span>
         </span>
       </form>
     </div>

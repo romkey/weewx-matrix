@@ -438,6 +438,7 @@
       return;
     }
     var input = this.inputEl;
+    var cursor = this.cursorEl;
     var pos = input.selectionStart;
     if (pos === null || pos === undefined) {
       pos = input.value.length;
@@ -451,9 +452,30 @@
     }
     var measure = this._cursorMeasure;
     measure.style.font = style.font;
+    measure.style.fontSize = style.fontSize;
+    measure.style.fontFamily = style.fontFamily;
+    measure.style.fontWeight = style.fontWeight;
     measure.style.letterSpacing = style.letterSpacing;
+    measure.style.lineHeight = style.lineHeight;
     measure.textContent = input.value.substring(0, pos) || "\u200b";
-    this.cursorEl.style.left = measure.offsetWidth + "px";
+
+    var padTop = parseFloat(style.paddingTop) || 0;
+    var padLeft = parseFloat(style.paddingLeft) || 0;
+    var padBottom = parseFloat(style.paddingBottom) || 0;
+    var lineHeight = parseFloat(style.lineHeight);
+    if (isNaN(lineHeight)) {
+      lineHeight = input.clientHeight - padTop - padBottom;
+    }
+    if (!lineHeight || lineHeight < 1) {
+      lineHeight = parseFloat(style.fontSize) || 16;
+    }
+    var inputHeight = input.clientHeight;
+    var top = padTop + Math.max(0, (inputHeight - padTop - padBottom - lineHeight) / 2);
+
+    cursor.style.top = top + "px";
+    cursor.style.left = (padLeft + measure.offsetWidth) + "px";
+    cursor.style.height = lineHeight + "px";
+    cursor.style.opacity = document.activeElement === input ? "1" : "0";
   };
 
   Shell.prototype.bindCursor = function () {
@@ -468,7 +490,25 @@
       self.inputEl.addEventListener(evt, sync);
     });
     window.addEventListener("resize", sync);
+    window.addEventListener("matrix-theme-change", function (e) {
+      if (e.detail && e.detail.theme === "matrix") {
+        try {
+          self.inputEl.focus({ preventScroll: true });
+        } catch (err) {
+          self.inputEl.focus();
+        }
+      }
+      sync();
+    });
     sync();
+    if (document.documentElement.getAttribute("data-theme") !== "safe") {
+      try {
+        this.inputEl.focus({ preventScroll: true });
+      } catch (err) {
+        this.inputEl.focus();
+      }
+      sync();
+    }
   };
 
   Shell.prototype.updatePrompt = function () {
