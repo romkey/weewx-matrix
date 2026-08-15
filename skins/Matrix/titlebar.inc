@@ -114,7 +114,10 @@
         <label class="shell_prompt" for="shell-input">
           <span class="user">guest</span><span class="at">@</span><span class="host">$host_slug</span><span class="path" id="shell-prompt-path">:~$</span>
         </label>
-        <input type="text" id="shell-input" class="shell_input" aria-label="Shell command input" autocapitalize="off" autocorrect="off">
+        <span class="shell_input_wrap">
+          <input type="text" id="shell-input" class="shell_input" aria-label="Shell command input" autocapitalize="off" autocorrect="off">
+          <span class="cursor shell_cursor" id="shell-cursor" aria-hidden="true"></span>
+        </span>
       </form>
     </div>
 #else
@@ -127,7 +130,7 @@
     <h1 class="page_title">$station.location</h1>
     <p class="lastupdate">
       $gettext("Last Update"): $current.dateTime &nbsp;|&nbsp;
-      <span class="clock" data-clock>&nbsp;</span><span class="cursor">&nbsp;</span>
+      <span class="clock" data-clock>&nbsp;</span>
     </p>
 
     #set $cls_index = ' class="current"' if $nav_current == 'index' else ''

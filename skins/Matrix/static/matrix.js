@@ -1,7 +1,8 @@
 /*
  * matrix.js -- behavior for the WeeWX "Matrix" skin.
  *   - Digital rain canvas backdrop
- *   - Live clock with blinking cursor
+ *   - Live clock
+ *   - Shell block cursor (see shell.js)
  *   - Safe Mode / Matrix theme toggle
  *   - Light plot swap in Safe Mode on light systems
  *   - Day/Week/Month/Year plot tabs (history page)

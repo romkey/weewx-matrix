@@ -42,6 +42,7 @@
     this.inputEl = document.getElementById("shell-input");
     this.formEl = document.getElementById("shell-form");
     this.promptPathEl = document.getElementById("shell-prompt-path");
+    this.cursorEl = document.getElementById("shell-cursor");
     this.dataUrl = rootEl.getAttribute("data-data-url") || "shell-data.json";
     this.seed = this.readSeedFromDom(rootEl);
     this.data = null;
@@ -430,6 +431,44 @@
       self.outputEl.appendChild(div);
     });
     this.outputEl.scrollTop = this.outputEl.scrollHeight;
+  };
+
+  Shell.prototype.updateCursor = function () {
+    if (!this.inputEl || !this.cursorEl) {
+      return;
+    }
+    var input = this.inputEl;
+    var pos = input.selectionStart;
+    if (pos === null || pos === undefined) {
+      pos = input.value.length;
+    }
+    var style = window.getComputedStyle(input);
+    if (!this._cursorMeasure) {
+      this._cursorMeasure = document.createElement("span");
+      this._cursorMeasure.className = "shell_cursor_measure";
+      this._cursorMeasure.setAttribute("aria-hidden", "true");
+      input.parentNode.appendChild(this._cursorMeasure);
+    }
+    var measure = this._cursorMeasure;
+    measure.style.font = style.font;
+    measure.style.letterSpacing = style.letterSpacing;
+    measure.textContent = input.value.substring(0, pos) || "\u200b";
+    this.cursorEl.style.left = measure.offsetWidth + "px";
+  };
+
+  Shell.prototype.bindCursor = function () {
+    var self = this;
+    if (!this.inputEl || !this.cursorEl) {
+      return;
+    }
+    var sync = function () {
+      self.updateCursor();
+    };
+    ["input", "keydown", "keyup", "click", "focus", "blur", "select"].forEach(function (evt) {
+      self.inputEl.addEventListener(evt, sync);
+    });
+    window.addEventListener("resize", sync);
+    sync();
   };
 
   Shell.prototype.updatePrompt = function () {
@@ -1065,11 +1104,13 @@
   Shell.prototype.bind = function () {
     var self = this;
     this.updatePrompt();
+    this.bindCursor();
 
     this.formEl.addEventListener("submit", function (e) {
       e.preventDefault();
       var val = self.inputEl.value;
       self.inputEl.value = "";
+      self.updateCursor();
       self.onSubmit(val);
     });
 

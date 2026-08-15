@@ -647,9 +647,18 @@ footer.term_footer a {
   margin: 0;
 }
 
+.shell_input_wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
 .shell_input {
   flex: 1;
   min-width: 0;
+  width: 100%;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -657,10 +666,29 @@ footer.term_footer a {
   color: var(--matrix-green);
   font: inherit;
   outline: none;
-  caret-color: var(--matrix-green);
+  caret-color: transparent;
   box-shadow: none;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.shell_cursor {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 1em;
+  margin-left: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.shell_cursor_measure {
+  position: absolute;
+  visibility: hidden;
+  white-space: pre;
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
 }
 
 .theme-toggle {
