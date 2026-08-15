@@ -63,7 +63,8 @@ weectl report run MatrixReport
 ```
 
 Open `index.html` in the report's `HTML_ROOT` (by default, the same `public_html`
-directory used by your other reports).
+directory used by your other reports). Served over HTTP the pages use directory
+URLs: `/` for the dashboard, then `/history/`, `/archive/`, and `/about/`.
 
 ### Manual installation
 

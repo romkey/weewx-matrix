@@ -1,8 +1,11 @@
-## history.html.tmpl -- Matrix skin historical data viewer.
+## history/index.html.tmpl -- Matrix skin historical data viewer.
 ## Shows Day/Week/Month/Year plot tabs plus a side-by-side statistics table.
+## NOTE: #include paths below are relative to the skin root, not this file's
+## directory, because WeeWX runs the Cheetah generator with the skin
+## directory as the current working directory.
 #errorCatcher Echo
 #encoding UTF-8
-#set global $rel = ""
+#set global $rel = "../"
 #set global $nav_current = "history"
 #set $periods = $to_list($DisplayOptions.get('periods', ['day', 'week', 'month', 'year']))
 #set $plot_groups = $to_list($DisplayOptions.get('plot_groups', ['tempdew', 'wind', 'rain']))
@@ -21,8 +24,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   #include "theme-init.inc"
   <title>$gettext("History") :: $station.location :: MATRIX_OS</title>
-  <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
-  <link rel="stylesheet" href="static/matrix.css?v=$SKIN_VERSION">
+  <link rel="icon" type="image/svg+xml" href="${rel}static/favicon.svg">
+  <link rel="stylesheet" href="${rel}static/matrix.css?v=$SKIN_VERSION">
 </head>
 <body>
   <canvas id="rain"></canvas>
@@ -56,7 +59,7 @@
               #end for
               #if $show_plot
               <figure>
-                <img src="${plot_name}.png" data-plot-light="${plot_name}_light.png" alt="$plot_name" loading="lazy">
+                <img src="${rel}${plot_name}.png" data-plot-light="${rel}${plot_name}_light.png" alt="$plot_name" loading="lazy">
                 <figcaption>${plot_name}.png</figcaption>
               </figure>
               #end if
@@ -114,7 +117,7 @@
 
       <section class="panel center">
         <p>$gettext("Deep archive intro")</p>
-        <p><a class="btn" href="archive.html">&gt; $gettext("Access Deep Archive")</a></p>
+        <p><a class="btn" href="${rel}archive/">&gt; $gettext("Access Deep Archive")</a></p>
       </section>
 
     </main>
@@ -122,9 +125,9 @@
     #include "footer.inc"
   </div>
 
-  <script src="static/matrix.js?v=$SKIN_VERSION" defer></script>
+  <script src="${rel}static/matrix.js?v=$SKIN_VERSION" defer></script>
   #if $to_bool($Extras.get('enable_shell', True))
-  <script src="static/shell.js?v=$SKIN_VERSION" defer></script>
+  <script src="${rel}static/shell.js?v=$SKIN_VERSION" defer></script>
   #end if
 </body>
 </html>

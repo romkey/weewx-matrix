@@ -10,7 +10,7 @@ station has ever recorded.
 
 ## Features
 
-- **Live dashboard** (`index.html`) — current conditions in a `cat
+- **Live dashboard** (`/`) — current conditions in a `cat
   /var/status/uplink`-style readout, plus 24-hour plots.
 - **Extended sensor support** — UV index and air quality (PM1.0 / PM2.5 /
   PM10.0), plus solar radiation and lightning, each rendered with
@@ -18,13 +18,13 @@ station has ever recorded.
   gated on `has_data`, so a station with none of these sensors simply won't
   show the panel at all — no errors, no empty boxes, no configuration
   required.
-- **Historical data viewer** (`history.html`) — tabbed Day/Week/Month/Year
+- **Historical data viewer** (`/history/`) — tabbed Day/Week/Month/Year
   plots plus a side-by-side statistics comparison table.
-- **Deep archive** (`archive.html`) — every calendar month and year in the
+- **Deep archive** (`/archive/`) — every calendar month and year in the
   station's database gets its own generated page (`archive/month-YYYY-MM.html`,
   `archive/year-YYYY.html`) with a daily/monthly log table, plus dropdowns
   and a directory-style listing for browsing the full history.
-- **About / System Info page** (`about.html`) — hardware, location, uptime,
+- **About / System Info page** (`/about/`) — hardware, location, uptime,
   WeeWX version.
 - Self-hosted, open-license monospace fonts (Share Tech Mono, VT323) —
   no external CDN or internet connection required to view the reports.
@@ -107,13 +107,13 @@ where to hook in.
 Matrix/
 ├── skin.conf                  # generator, plot, and display configuration
 ├── lang/en.conf                # localizable text strings
-├── index.html.tmpl             # dashboard
-├── history.html.tmpl           # Day/Week/Month/Year plots + stats
-├── archive.html.tmpl           # deep archive index (month/year picker)
+├── index.html.tmpl             # dashboard, served at /
+├── history/index.html.tmpl     # Day/Week/Month/Year plots + stats, at /history/
 ├── archive/
+│   ├── index.html.tmpl         # deep archive index (month/year picker), at /archive/
 │   ├── month-%Y-%m.html.tmpl   # one page per calendar month (SummaryByMonth)
 │   └── year-%Y.html.tmpl       # one page per calendar year (SummaryByYear)
-├── about.html.tmpl             # station / system info
+├── about/index.html.tmpl       # station / system info, at /about/
 ├── rss.xml.tmpl                # RSS feed
 ├── titlebar.inc / footer.inc / current.inc / sensors.inc   # shared includes
 ├── static/
@@ -135,6 +135,16 @@ Matrix/
   and `$nav_current`, used to compute relative links and highlight the
   active nav item) are set with `#set global`, since a plain `#set` is not
   visible inside includes.
+- The main pages live in their own directories (`history/index.html.tmpl` and
+  friends) so their URLs are `/history/` rather than `/history.html`. Every
+  asset and cross-page link is written as `${rel}…` so a template keeps
+  working if its depth changes; `$rel` is the only thing that needs updating.
+- The per-year and per-month archive pages keep a `.html` extension on
+  purpose. WeeWX builds a page's output directory from `os.path.dirname()` of
+  the configured template path and only expands `strftime` codes in the
+  *basename* (see `getFileName()` in `weeutil/weeutil.py`), so a template path
+  like `archive/%Y/index.html.tmpl` would create a literal `%Y` directory
+  rather than one per year.
 
 ## License
 

@@ -1,3 +1,14 @@
+1.2.1 — 2026-08-15
+  Clean directory URLs: the dashboard is served at /, and the other pages
+  moved to /history/, /archive/, and /about/ instead of history.html,
+  archive.html, and about.html.
+  NOTE: the old .html URLs are gone, so update any bookmarks or inbound
+  links. Per-year and per-month archive pages keep their .html names.
+  Canonical URL drops index.html and tolerates a trailing slash in
+  station_url.
+  Templates now build every asset and cross-page link from $rel, so page
+  depth is defined in one place.
+
 1.2.0 — 2026-08-14
   Current conditions refresh in place from current.json once a minute.
   New [Extras] option: live_update_seconds (0 disables polling).

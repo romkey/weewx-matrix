@@ -16,7 +16,8 @@
   <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
   <link rel="stylesheet" href="static/matrix.css?v=$SKIN_VERSION">
   #if $station.station_url
-  <link rel="canonical" href="$station.station_url/index.html" />
+  #set $canonical_base = $station.station_url.rstrip('/')
+  <link rel="canonical" href="$canonical_base/" />
   #end if
   #if $Extras.has_key('googleAnalyticsId')
   <script async src="https://www.googletagmanager.com/gtag/js?id=$Extras.googleAnalyticsId"></script>
@@ -58,7 +59,7 @@
           #end if
         #end for
         </div>
-        <p><a class="btn" href="history.html">&gt; $gettext("Access Historical Archives")</a></p>
+        <p><a class="btn" href="${rel}history/">&gt; $gettext("Access Historical Archives")</a></p>
       </section>
 
     </main>

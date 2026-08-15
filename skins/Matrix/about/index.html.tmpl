@@ -1,7 +1,10 @@
-## about.html.tmpl -- system/station info page for the Matrix skin.
+## about/index.html.tmpl -- system/station info page for the Matrix skin.
+## NOTE: #include paths below are relative to the skin root, not this file's
+## directory, because WeeWX runs the Cheetah generator with the skin
+## directory as the current working directory.
 #errorCatcher Echo
 #encoding UTF-8
-#set global $rel = ""
+#set global $rel = "../"
 #set global $nav_current = "about"
 #set $hardware_display = $Extras.get('hardware_name', '') or $station.hardware
 <!DOCTYPE html>
@@ -11,8 +14,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   #include "theme-init.inc"
   <title>$gettext("System Info") :: $station.location :: MATRIX_OS</title>
-  <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
-  <link rel="stylesheet" href="static/matrix.css?v=$SKIN_VERSION">
+  <link rel="icon" type="image/svg+xml" href="${rel}static/favicon.svg">
+  <link rel="stylesheet" href="${rel}static/matrix.css?v=$SKIN_VERSION">
 </head>
 <body>
   <canvas id="rain"></canvas>
@@ -73,9 +76,9 @@
     #include "footer.inc"
   </div>
 
-  <script src="static/matrix.js?v=$SKIN_VERSION" defer></script>
+  <script src="${rel}static/matrix.js?v=$SKIN_VERSION" defer></script>
   #if $to_bool($Extras.get('enable_shell', True))
-  <script src="static/shell.js?v=$SKIN_VERSION" defer></script>
+  <script src="${rel}static/shell.js?v=$SKIN_VERSION" defer></script>
   #end if
 </body>
 </html>

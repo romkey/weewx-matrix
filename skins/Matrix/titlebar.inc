@@ -138,11 +138,13 @@
     #set $cls_history = ' class="current"' if $nav_current == 'history' else ''
     #set $cls_archive = ' class="current"' if $nav_current == 'archive' else ''
     #set $cls_about = ' class="current"' if $nav_current == 'about' else ''
+    ## Link to the directory rather than index.html so the address bar stays clean.
+    #set $home_href = $rel if $rel else "./"
     <nav class="mainnav">
-      <a href="${rel}index.html"$cls_index>$gettext("Home")</a>
-      <a href="${rel}history.html"$cls_history>$gettext("History")</a>
-      <a href="${rel}archive.html"$cls_archive>$gettext("Archive")</a>
-      <a href="${rel}about.html"$cls_about>$gettext("About")</a>
+      <a href="$home_href"$cls_index>$gettext("Home")</a>
+      <a href="${rel}history/"$cls_history>$gettext("History")</a>
+      <a href="${rel}archive/"$cls_archive>$gettext("Archive")</a>
+      <a href="${rel}about/"$cls_about>$gettext("About")</a>
       #if $atproto_url
       <a href="$atproto_url">$gettext("ATPROTO")</a>
       #end if

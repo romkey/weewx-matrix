@@ -16,8 +16,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   #include "theme-init.inc"
   <title>$year_name :: $gettext("Monthly Summary") :: MATRIX_OS</title>
-  <link rel="icon" type="image/svg+xml" href="../static/favicon.svg">
-  <link rel="stylesheet" href="../static/matrix.css?v=$SKIN_VERSION">
+  <link rel="icon" type="image/svg+xml" href="${rel}static/favicon.svg">
+  <link rel="stylesheet" href="${rel}static/matrix.css?v=$SKIN_VERSION">
 </head>
 <body>
   <canvas id="rain"></canvas>
@@ -28,7 +28,7 @@
     <main class="terminal">
 
       <section class="panel">
-        <p><a href="../archive.html">&laquo; $gettext("Back to Archive")</a></p>
+        <p><a href="./">&laquo; $gettext("Back to Archive")</a></p>
         <h2>$gettext("Monthly Summary") :: $year_name</h2>
 
         <div class="table-scroll">
@@ -102,9 +102,9 @@
     #include "footer.inc"
   </div>
 
-  <script src="../static/matrix.js?v=$SKIN_VERSION" defer></script>
+  <script src="${rel}static/matrix.js?v=$SKIN_VERSION" defer></script>
   #if $to_bool($Extras.get('enable_shell', True))
-  <script src="../static/shell.js?v=$SKIN_VERSION" defer></script>
+  <script src="${rel}static/shell.js?v=$SKIN_VERSION" defer></script>
   #end if
 </body>
 </html>

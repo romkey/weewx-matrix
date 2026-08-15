@@ -1,8 +1,13 @@
-## archive.html.tmpl -- Matrix skin deep archive index.
-## Lets the user jump to any month or year of station history.
+## archive/index.html.tmpl -- Matrix skin deep archive index.
+## Lets the user jump to any month or year of station history. The per-year and
+## per-month pages are siblings in this same directory, so they are linked
+## without a prefix.
+## NOTE: #include paths below are relative to the skin root, not this file's
+## directory, because WeeWX runs the Cheetah generator with the skin
+## directory as the current working directory.
 #errorCatcher Echo
 #encoding UTF-8
-#set global $rel = ""
+#set global $rel = "../"
 #set global $nav_current = "archive"
 #set $months = list(reversed(list($SummaryByMonth)))
 #set $years = list(reversed(list($SummaryByYear)))
@@ -13,8 +18,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   #include "theme-init.inc"
   <title>$gettext("Archive") :: $station.location :: MATRIX_OS</title>
-  <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
-  <link rel="stylesheet" href="static/matrix.css?v=$SKIN_VERSION">
+  <link rel="icon" type="image/svg+xml" href="${rel}static/favicon.svg">
+  <link rel="stylesheet" href="${rel}static/matrix.css?v=$SKIN_VERSION">
 </head>
 <body>
   <canvas id="rain"></canvas>
@@ -31,7 +36,7 @@
         <div class="archive-select">
           <div>
             <label for="jump-month">$gettext("Jump to") &mdash; $gettext("Monthly Records")</label>
-            <select id="jump-month" onchange="gotoArchive('archive/month-', this.value)">
+            <select id="jump-month" onchange="gotoArchive('month-', this.value)">
               <option selected disabled>$gettext("select month")</option>
               #for $monthYear in $months
               <option value="$monthYear">$monthYear</option>
@@ -40,7 +45,7 @@
           </div>
           <div>
             <label for="jump-year">$gettext("Jump to") &mdash; $gettext("Yearly Records")</label>
-            <select id="jump-year" onchange="gotoArchive('archive/year-', this.value)">
+            <select id="jump-year" onchange="gotoArchive('year-', this.value)">
               <option selected disabled>$gettext("select year")</option>
               #for $yr in $years
               <option value="$yr">$yr</option>
@@ -55,7 +60,7 @@
         <h3>$gettext("Yearly Records")</h3>
         <div class="dir-listing">
           #for $yr in $years
-          <a href="archive/year-${yr}.html">year-${yr}.html</a>
+          <a href="year-${yr}.html">year-${yr}.html</a>
           #end for
         </div>
       </section>
@@ -66,7 +71,7 @@
         <h3>$gettext("Monthly Records")</h3>
         <div class="dir-listing">
           #for $monthYear in $months
-          <a href="archive/month-${monthYear}.html">month-${monthYear}.html</a>
+          <a href="month-${monthYear}.html">month-${monthYear}.html</a>
           #end for
         </div>
       </section>
@@ -83,9 +88,9 @@
     #include "footer.inc"
   </div>
 
-  <script src="static/matrix.js?v=$SKIN_VERSION" defer></script>
+  <script src="${rel}static/matrix.js?v=$SKIN_VERSION" defer></script>
   #if $to_bool($Extras.get('enable_shell', True))
-  <script src="static/shell.js?v=$SKIN_VERSION" defer></script>
+  <script src="${rel}static/shell.js?v=$SKIN_VERSION" defer></script>
   #end if
 </body>
 </html>

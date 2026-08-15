@@ -73,6 +73,11 @@ jobs:
           grep -q '\[\[MatrixReport\]\]' "$RUNNER_TEMP/station/weewx.conf"
           test -f "$RUNNER_TEMP/station/skins/Matrix/skin.conf"
           test -f "$RUNNER_TEMP/station/skins/Matrix/static/matrix.css"
+          # Several templates share the basename index.html.tmpl, so confirm the
+          # installer kept them in their own subdirectories.
+          test -f "$RUNNER_TEMP/station/skins/Matrix/history/index.html.tmpl"
+          test -f "$RUNNER_TEMP/station/skins/Matrix/archive/index.html.tmpl"
+          test -f "$RUNNER_TEMP/station/skins/Matrix/about/index.html.tmpl"
 
       - name: Seed archive data for report generation
         run: |
@@ -94,6 +99,9 @@ jobs:
           python -m json.tool "$HTML_ROOT/shell-data.json" > /dev/null
           python -m json.tool "$HTML_ROOT/current.json" > /dev/null
           test -f "$HTML_ROOT/index.html"
+          test -f "$HTML_ROOT/history/index.html"
+          test -f "$HTML_ROOT/archive/index.html"
+          test -f "$HTML_ROOT/about/index.html"
           test -f "$HTML_ROOT/static/shell.js"
           ls "$HTML_ROOT"/daytempdew.png "$HTML_ROOT"/daytempdew_light.png
 

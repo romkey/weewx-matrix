@@ -62,9 +62,9 @@ class TestMatrixExtension(unittest.TestCase):
     def test_templates_are_non_empty(self):
         patterns = (
             'index.html.tmpl',
-            'history.html.tmpl',
-            'archive.html.tmpl',
-            'about.html.tmpl',
+            'history/index.html.tmpl',
+            'archive/index.html.tmpl',
+            'about/index.html.tmpl',
             'rss.xml.tmpl',
             'shell-data.json.tmpl',
             'current.json.tmpl',
@@ -128,7 +128,7 @@ class TestMatrixExtension(unittest.TestCase):
             extras_text = skin_conf.read()
         self.assertIn('hardware_name', extras_text)
         self.assertIn('atproto', extras_text)
-        self.assertEqual(conf['SKIN_VERSION'], '1.2.0')
+        self.assertEqual(conf['SKIN_VERSION'], '1.2.1')
 
 
 if __name__ == '__main__':
