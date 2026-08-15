@@ -1,5 +1,6 @@
 /*
- * matrix.js -- behavior for the WeeWX "Matrix" skin.
+ * matrix.js v1.1.1 — behavior for the WeeWX "Matrix" skin.
+ * Theme state lives in theme-toggle.inc (inline); do not export MatrixTheme here.
  *   - Digital rain canvas backdrop
  *   - Live clock
  *   - Shell block cursor (see shell.js)

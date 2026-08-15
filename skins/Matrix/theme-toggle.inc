@@ -38,6 +38,17 @@
     window.dispatchEvent(new CustomEvent("matrix-theme-change", { detail: { theme: theme } }));
   }
 
+  var themeApi = { get: getTheme, set: setTheme };
+  try {
+    Object.defineProperty(window, "MatrixTheme", {
+      value: themeApi,
+      writable: false,
+      configurable: true
+    });
+  } catch (e) {
+    window.MatrixTheme = themeApi;
+  }
+
   function initToggle() {
     var btn = document.getElementById("theme-toggle");
     if (!btn || btn.dataset.themeBound === "1") {
@@ -49,11 +60,6 @@
       setTheme(getTheme() === "safe" ? "matrix" : "safe");
     });
   }
-
-  window.MatrixTheme = {
-    get: getTheme,
-    set: setTheme
-  };
 
   initToggle();
 })();

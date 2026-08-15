@@ -83,9 +83,9 @@
     #include "footer.inc"
   </div>
 
-  <script src="static/matrix.js" defer></script>
+  <script src="static/matrix.js?v=$SKIN_VERSION" defer></script>
   #if $to_bool($Extras.get('enable_shell', True))
-  <script src="static/shell.js" defer></script>
+  <script src="static/shell.js?v=$SKIN_VERSION" defer></script>
   #end if
 </body>
 </html>
